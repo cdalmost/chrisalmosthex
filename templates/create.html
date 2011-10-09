@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <title>Chris Almost's Hex</title>
+    <script type="text/javascript" src="js/create.js"></script>
+    <link type="text/css" rel="stylesheet" href="css/hex.css" />
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-16113437-2']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="huge">Hex...</div>
+
+    <form id="newGame" action="/create" method="post" onsubmit="return validateNewGame();">
+      <table>
+        <tr>
+          <td>Your name:</td>
+          <td><input type="text" name="p1" id="p1" /></td>
+          <td>You are blue.</td>
+        </tr>
+        <tr>
+          <td>Your email:</td>
+          <td><input type="text" name="e1" id="e1" /></td>
+          <td>Your opponent is red.</td>
+        </tr>
+        <tr>
+          <td>Opponent's name:</td>
+          <td><input type="text" name="p2" id="p2" /></td>
+          <td>Red goes first.</td>
+        </tr>
+        <tr>
+          <td>Opponent's email:</td>
+          <td><input type="text" name="e2" id="e2" /></td>
+          <td>The board is <a href="javascript: rotateBoardSize();" id="sizeLink">14x14</a>.
+            <input type="hidden" name="size" id="size" value="14" /></td>
+        </tr>
+      </table>
+
+      <input type="submit" class="fancy" value="Create the game &raquo;" />
+    </form>
+
+  </body>
+</html>

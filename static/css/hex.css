@@ -1,0 +1,51 @@
+body {
+  font-family: Verdana, Helvetica, sans-serif;
+  color: rgb(255, 192, 0);
+  background-color: rgb(0, 102, 153);
+}
+a:link {
+  color: rgb(255, 192, 0);
+  text-decoration: none;
+}
+a:visited {
+  color: rgb(255, 192, 0);
+  text-decoration: none;
+}
+a:active {
+  color: rgb(255, 192, 0);
+  text-decoration: none;
+}
+a:hover {
+  color: rgb(255, 232, 0);
+  text-decoration: underline;
+}
+.huge {
+  font-size: 950%;
+  color: rgb(255, 232, 0);
+}
+.big {
+  font-size: 350%;
+  color: rgb(255, 232, 0);
+}
+.footer {
+  font-size: x-small;
+  color: rgb(208, 208, 208);
+}
+a.footer {
+  font-size: x-small;
+  color: rgb(208, 208, 208);
+}
+p {
+  color: rgb(208, 208, 208);
+  width: 33em;
+}
+input.fancy {
+  color: rgb(255, 192, 0);
+  background-color: rgb(0, 102, 153);
+  border: 0px;
+  font-size: x-large;
+}
+input.fancy:hover {
+  color: rgb(255, 232, 0);
+  text-decoration: underline;
+}
