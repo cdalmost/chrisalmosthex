@@ -1,0 +1,71 @@
+Chris Almost's Hex for Google's AppEngine.
+Copyright (c) Christopher Almost, 2011.
+http://hex.chrisalmost.org/
+
+
+About this repository
+---------------------
+This is the board game Hex (http://en.wikipedia.org/wiki/Hex_game), implemented
+as a web service for Google's AppEngine in the style of Dave Peck's Go
+(http://go.davepeck.org/).  The latest version can be found at
+http://hex.chrisalmost.org/ for the foreseeable future.
+
+Currently, the service lets you set up a game of Hex with a friend.  Upon
+making a move your opponent receives an email letting them know it's their
+turn.  There are no logins or passwords.  That's it!
+
+I wrote this code as a "weekend hack" and for the purpose of learning more
+about web services (see http://davepeck.org/2009/01/26/weekend-hack-1-go/).
+The bulk of the code was written in one 20 hour session on 12 June 2011, and
+only minor improvements have been made since then.  Consequently, the code is a
+bit rough around the edges.  But it works, and as far as I know it is the only
+service of its kind.  Hex is a great game with deep strategy and simple rules
+that deserves to have a wider audience.
+
+
+A map of the code
+-----------------
+This was a surprisingly simple project and there is correspondingly little
+code.  The most complicated part is hex-board.js.
+
+chrisalmosthex.py
+
+    AppEngine server-side code, including creating and maintaining games.  The
+    coding techniques in this file are direct applications of what the Google
+    AppEngine tutorial teaches.
+
+hexutils.py
+
+    Hex related services, including checking for a winner.
+
+static/css/hex.css
+
+    Common style sheet for the service.
+
+static/js/
+
+    The Hex board is drawn client-side using the Raphael Javascript "vector
+    graphics" library (http://raphaeljs.com/).
+
+templates/
+
+    The page that users will see most often is "play.html" which displays their
+    current game and allows them to make a move if it is their turn.  New games
+    are created from "create.html".
+
+
+Possible improvements
+---------------------
+There are many, many improvements that could be made.
+
+- Give the option of sending non-email notifications, such as twitter messages.
+
+- Implement the "pie rule" that allows the second player to swap colours after
+  the first player's first move.  (This should be trivial.)
+
+- Send reminder emails to the active player after a period of inactivity.
+
+- Refresh an open game automatically upon an opponent sending a move to the
+  server.  (This should be trivial using the Channel API.)
+
+- Many more I haven't thought of...
