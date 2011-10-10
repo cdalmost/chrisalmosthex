@@ -61,11 +61,15 @@ There are many, many improvements that could be made.
 - Give the option of sending non-email notifications, such as twitter messages.
 
 - Implement the "pie rule" that allows the second player to swap colours after
-  the first player's first move.  (This should be trivial.)
+  the first player's first move.  (Coding this up is trivial but, since
+  inexperienced players will usually be going first, doing it in a way that
+  makes it clear to a new player what just happened will require some
+  creativity.
 
-- Send reminder emails to the active player after a period of inactivity.
+- Send a reminder email to the active player after a long period of inactivity.
 
-- Refresh an open game automatically upon an opponent sending a move to the
-  server.  (This should be trivial using the Channel API.)
+- Update an open game automatically upon an opponent sending a move to the
+  server.  (This is currently done in one of the simplest and most inelegant
+  ways possible and could surely be improved upon.)
 
 - Many more I haven't thought of...

@@ -1,6 +1,7 @@
 <html>
   <head>
     <title>Chris Almost's Hex</title>
+    <script type="text/javascript" src="/_ah/channel/jsapi"></script>
     <script type="text/javascript" src="js/raphael-min.js"></script>
     <script type="text/javascript" src="js/hex-board.js"></script>
     <link type="text/css" rel="stylesheet" href="css/hex.css" />
@@ -15,7 +16,7 @@
       })();
     </script>
   </head>
-  <body onload="initialize({{ size }}, '{{ state }}', '{{ p }}', '{{ m }}');">
+  <body onload="drawBoard({{ size }}, '{{ state }}', '{{ p }}', '{{ m }}');">
 
     <h1>{{ r_name }} (red) vs. {{ b_name }} (blue)</h1>
 
@@ -44,5 +45,7 @@
         </td>
       </tr>
     </table>
+
+    <script type="text/javascript">openChannel('{{ token }}');</script>
   </body>
 </html>

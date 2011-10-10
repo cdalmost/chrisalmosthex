@@ -2,7 +2,7 @@
 
 import os, re, datetime, hashlib, urllib
 from hexutils import HexGame
-from google.appengine.api import users, mail
+from google.appengine.api import users, mail, channel
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -17,6 +17,9 @@ class Game(db.Model):
   # Unique game identifiers
   r_hash = db.StringProperty()
   b_hash = db.StringProperty()
+  # Are the players currently connected?
+  r_conn = db.BooleanProperty()
+  b_conn = db.BooleanProperty()
   # Game status
   size   = db.IntegerProperty()
   onus   = db.StringProperty()  # 'r' or 'b' ('w' iff game over)
@@ -59,6 +62,8 @@ class GameCreator(webapp.RequestHandler):
     g.r_name = p2 # Opponent is red.
     g.b_email = e1
     g.r_email = e2
+    g.b_conn = True # Creator is redirected presently.
+    g.r_conn = False
     # Create unique game identifiers.
     now = datetime.datetime.now()
     g.b_hash = hashlib.sha1(p1 + 'b' + repr(now)).hexdigest()
@@ -81,6 +86,28 @@ class GameCreator(webapp.RequestHandler):
     # Send the creator to his (blank) game page.
     self.redirect('/play?' + urllib.urlencode({'hash': g.b_hash}))
 
+class ConnectionHandler(webapp.RequestHandler):
+  def post(self):
+    game_hash = self.request.get('from')
+    p, g = player_and_game_from_hash(game_hash)
+    if g:
+      if 'r' == p:
+        g.r_conn = True
+      else: # 'b' == p
+        g.b_conn = True
+      g.put()
+
+class DisconnectionHandler(webapp.RequestHandler):
+  def post(self):
+    game_hash = self.request.get('from')
+    p, g = player_and_game_from_hash(game_hash)
+    if g:
+      if 'r' == p:
+        g.r_conn = False
+      else: # 'b' == p
+        g.b_conn = False
+      g.put()
+
 class GameDisplayer(webapp.RequestHandler):
   def get(self):
     # A player wishes to view his game.
@@ -92,11 +119,13 @@ class GameDisplayer(webapp.RequestHandler):
         mesg = "The game is over (%s won)." % g.winner
       else:
         mesg = "It's %s's turn." % (g.r_name if ('r' == g.onus) else g.b_name)
+      token = channel.create_channel(game_hash)
       template_values = {
         'r_name': g.r_name,
         'b_name': g.b_name,
         'mesg': mesg,
         'hash': game_hash,
+        'token': token,
         'size': g.size,
         'state': g.state,
         'm': g.onus,
@@ -117,16 +146,18 @@ class MoveMaker(webapp.RequestHandler):
     if not (g.onus == p):
       self.redirect('/play?' + urllib.urlencode({'hash': game_hash}))
       return
-    # Prepare to send an email to the opponent.
+    # Prepare to process the move.
     if p == 'r':
       p_name = g.r_name
       o_name = g.b_name
       o_hash = g.b_hash
+      o_conn = g.b_conn
       o_email = g.b_email
     else: # p == 'b'
       p_name = g.b_name
       o_name = g.r_name
       o_hash = g.r_hash
+      o_conn = g.r_conn
       o_email = g.r_email
 
     # Get the move and act on it.
@@ -159,13 +190,16 @@ class MoveMaker(webapp.RequestHandler):
       else:
         # Send them on their merry way.
         self.redirect('/play?' + urllib.urlencode({'hash': game_hash}))
-        mail.send_mail(sender="Chris Almost <cdalmost@gmail.com>",
-            to=o_email,
-            subject="[Move #%d] It's your turn against %s." % (g.move, p_name),
-            body=move_mesg % (o_name, p_name, urllib.urlencode({'hash': o_hash})))
-
-    # Very important: record the update!
+        # Send opponent an email if they are not currently connected.
+        if not o_conn:
+          mail.send_mail(sender="Chris Almost <cdalmost@gmail.com>",
+              to=o_email,
+              subject="[Move #%d] It's your turn against %s." % (g.move, p_name),
+              body=move_mesg % (o_name, p_name, urllib.urlencode({'hash': o_hash})))
+    # Record the update.
     g.put()
+    # Refresh opponent's page if they are connected.
+    if o_conn: channel.send_message(o_hash, "reload")
 
 def player_and_game_from_hash(game_hash):
   if game_hash:
@@ -221,7 +255,9 @@ application = webapp.WSGIApplication([
   ('/move',   MoveMaker),
   ('/create', GameCreator),
   ('/about',  AboutPage),
-  ('/.*',     CreatePage),
+  ('/_ah/channel/disconnected/', DisconnectionHandler),
+  ('/_ah/channel/connected/',    ConnnectionHandler),
+  ('/.*', CreatePage),
 ], debug=True)
 
 def main():

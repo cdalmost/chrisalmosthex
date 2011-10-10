@@ -1,7 +1,10 @@
 application: chrisalmosthex
-version: 1
+version: 1-1
 runtime: python
 api_version: 1
+
+inbound_services:
+- channel_presence
 
 handlers:
 - url: /css
@@ -16,3 +19,4 @@ handlers:
 
 - url: /.*
   script: chrisalmosthex.py
+

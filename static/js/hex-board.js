@@ -1,4 +1,5 @@
-function initialize(n, state, player, mover) {
+
+function drawBoard(n, state, player, mover) {
   if (player == mover) {
     resign = document.getElementById('resign');
     if (resign) { resign.disabled = false; }
@@ -71,4 +72,15 @@ function initialize(n, state, player, mover) {
     }
   }
   return tiles;
+}
+
+function openChannel(token) {
+  channel = new goog.appengine.Channel(token);
+  socket = channel.open();
+  socket.onopen  = function () {};
+  socket.onclose = function () {};
+  socket.onerror = function () {};
+  socket.onmessage = function (m) {
+    if (m.data == "reload") { location.reload(true); }
+  };
 }
