@@ -5,7 +5,7 @@ body {
 }
 a:link {
   color: rgb(255, 192, 0);
-  text-decoration: none;
+  text-decoration: underline;
 }
 a:visited {
   color: rgb(255, 192, 0);
@@ -17,7 +17,7 @@ a:active {
 }
 a:hover {
   color: rgb(255, 232, 0);
-  text-decoration: underline;
+  text-decoration: none;
 }
 .huge {
   font-size: 950%;

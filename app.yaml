@@ -1,5 +1,5 @@
 application: chrisalmosthex
-version: 1-1
+version: 1-2
 runtime: python
 api_version: 1
 
@@ -17,6 +17,8 @@ handlers:
   static_files: static/images/favicon.ico
   upload: static/images/favicon\.ico
 
-- url: /.*
-  script: chrisalmosthex.py
+- url: /tasks/.*
+  script: tasks.py
 
+- url: /.*
+  script: hex.py

@@ -28,7 +28,7 @@ function validateNewGame() {
     }
   }
   else {
-    alert("Neither name may be empty");
+    alert("Neither name may be empty.");
     return false;
   }
 }

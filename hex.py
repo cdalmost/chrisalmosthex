@@ -2,14 +2,14 @@
 
 import os, re, datetime, hashlib, urllib
 from hexutils import HexGame
-from google.appengine.api import users, mail, channel
+from google.appengine.api import mail, channel
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 
 class Game(db.Model):
   """Models a hex game, with the players, contact info, game state, etc."""
-  # Player information.
+  # Player information: name and email
   r_name  = db.StringProperty()
   b_name  = db.StringProperty()
   r_email = db.EmailProperty()
@@ -62,7 +62,7 @@ class GameCreator(webapp.RequestHandler):
     g.r_name = p2 # Opponent is red.
     g.b_email = e1
     g.r_email = e2
-    g.b_conn = True # Creator is redirected presently.
+    g.b_conn = True # Creator is redirected immediately.
     g.r_conn = False
     # Create unique game identifiers.
     now = datetime.datetime.now()
@@ -250,18 +250,16 @@ Your opponent, %s, resigned, so you won the game.  Congratulations.
 http://hex.chrisalmost.org/play?%s
 """
 
-application = webapp.WSGIApplication([
-  ('/play',   GameDisplayer),
-  ('/move',   MoveMaker),
-  ('/create', GameCreator),
-  ('/about',  AboutPage),
-  ('/_ah/channel/disconnected/', DisconnectionHandler),
-  ('/_ah/channel/connected/',    ConnnectionHandler),
-  ('/.*', CreatePage),
-], debug=True)
-
 def main():
-  run_wsgi_app(application)
+  run_wsgi_app(webapp.WSGIApplication([
+      ('/play',   GameDisplayer),
+      ('/move',   MoveMaker),
+      ('/create', GameCreator),
+      ('/about',  AboutPage),
+      ('/_ah/channel/disconnected/', DisconnectionHandler),
+      ('/_ah/channel/connected/',    ConnectionHandler),
+      ('/.*', CreatePage),
+    ], debug=True))
 
 if __name__ == '__main__':
   main()

@@ -8,19 +8,18 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 
 class SendReminders(webapp.RequestHandler):
   def get(self):
-    pass
+    #games = db.GqlQuery("SELECT * FROM Game WHERE date_modified < :1", week_ago)
+    week_ago = datetime.datetime.now() - datetime.timedelta(days=6)
+    long_ago = datetime.datetime.now() - datetime.timedelta(weeks=9)
 
 class SendSummary(webapp.RequestHandler):
   def get(self):
-    week_ago = datetime.datetime.now() - datetime.timedelta(days=6)
-    long_ago = datetime.datetime.now() - datetime.timedelta(weeks=8)
-
-    #games = db.GqlQuery("SELECT * FROM Game WHERE date_modified < :1", week_ago)
     games = db.GqlQuery("SELECT * FROM Game")
+    long_ago = datetime.datetime.now() - datetime.timedelta(weeks=9)
 
     entries = ['Red vs. Blue']
     for game in games:
-      flag = '*' if game.date_modified < long_ago else ''
+      flag = '(old)' if game.date_modified < long_ago else '(new)'
       entries.append("created %s, last modified %s, %s vs. %s %s"
           % (str(game.date_created.date()),
              str(game.date_modified.date()),

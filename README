@@ -64,7 +64,7 @@ There are many, many improvements that could be made.
   the first player's first move.  (Coding this up is trivial but, since
   inexperienced players will usually be going first, doing it in a way that
   makes it clear to a new player what just happened will require some
-  creativity.
+  creativity.)
 
 - Send a reminder email to the active player after a long period of inactivity.
 

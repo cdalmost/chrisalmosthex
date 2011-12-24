@@ -4,4 +4,4 @@ cron:
   schedule: every 168 hours
 - description: summary email
   url: /tasks/summary
-  schedule: every 24 hours
+  schedule: every 168 hours
