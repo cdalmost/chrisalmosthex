@@ -21,10 +21,11 @@ class Game(db.Model):
   r_conn = db.BooleanProperty()
   b_conn = db.BooleanProperty()
   # Game status
-  size   = db.IntegerProperty()
+  size   = db.IntegerProperty() # game size, usually 11, 14, or 19
   onus   = db.StringProperty()  # 'r' or 'b' ('w' iff game over)
   winner = db.StringProperty()  # name of winner or ''
-  state  = db.StringProperty()
+  state  = db.StringProperty()  # game state string, size x size
+  last   = db.IntegerProperty() # coordinate of last move made
   # Useful statistics
   move = db.IntegerProperty()
   date_created  = db.DateTimeProperty(auto_now_add=True)
@@ -72,6 +73,7 @@ class GameCreator(webapp.RequestHandler):
     g.onus   = 'r' # Red moves first.
     g.winner = ''
     g.state  = (size * size) * 'w'
+    g.last   = -1
     g.move   = 0
     g.put() # Add the game to the database.
 
@@ -127,6 +129,7 @@ class GameDisplayer(webapp.RequestHandler):
         'hash': game_hash,
         'token': token,
         'size': g.size,
+        'last': g.last,
         'state': g.state,
         'm': g.onus,
         'p': p,
@@ -173,6 +176,7 @@ class MoveMaker(webapp.RequestHandler):
       x, y = move_str.split(' ')
       index = g.size * int(x) + int(y)
       g.state = g.state[:index] + p + g.state[index+1:]
+      g.last = index
       g.move += 1
       g.onus = HexGame.swap[p]
 
