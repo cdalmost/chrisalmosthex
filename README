@@ -36,7 +36,7 @@ chrisalmosthex.py
 
 hexutils.py
 
-    Hex related services, including checking for a winner.
+    Hex related services, including basic checks for a winner.
 
 static/css/hex.css
 
@@ -63,13 +63,13 @@ There are many, many improvements that could be made.
 - Implement the "pie rule" that allows the second player to swap colours after
   the first player's first move.  (Coding this up is trivial but, since
   inexperienced players will usually be going first, doing it in a way that
-  makes it clear to a new player what just happened will require some
+  makes it clear to a new player what just happened will require some design
   creativity.)
 
 - Send a reminder email to the active player after a long period of inactivity.
 
 - Update an open game automatically upon an opponent sending a move to the
   server.  (This is currently done in one of the simplest and most inelegant
-  ways possible and could surely be improved upon.)
+  ways possible using the Channel API and could surely be improved upon.)
 
 - Many more I haven't thought of...

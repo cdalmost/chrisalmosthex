@@ -27,7 +27,7 @@ class Game(db.Model):
   state  = db.StringProperty()  # game state string, size x size
   last   = db.IntegerProperty() # coordinate of last move made
   # Useful statistics
-  move = db.IntegerProperty()
+  move = db.IntegerProperty()   # number of moves made so far
   date_created  = db.DateTimeProperty(auto_now_add=True)
   date_modified = db.DateTimeProperty(auto_now=True)
 

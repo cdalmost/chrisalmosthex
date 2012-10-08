@@ -8,22 +8,39 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 
 class SendReminders(webapp.RequestHandler):
   def get(self):
-    #games = db.GqlQuery("SELECT * FROM Game WHERE date_modified < :1", week_ago)
-    week_ago = datetime.datetime.now() - datetime.timedelta(days=6)
-    long_ago = datetime.datetime.now() - datetime.timedelta(weeks=9)
+    period   = datetime.datetime.now() - datetime.timedelta(days=5)
+    long_ago = datetime.datetime.now() - datetime.timedelta(weeks=5)
+    games = db.GqlQuery("SELECT * FROM Game" +
+                        "WHERE date_modified < :1 AND date_modified > :2",
+                        period, long_ago)
+
+    for game in games:
+      if not 'w' == game.onus: # Game has no winner yet.
+        story = "%s vs. %s, created %s, last modified %s" \
+            % (game.r_name, game.b_name, \
+            str(game.date_created.date()), \
+            str(game.date_modified.date()))
+        mail.send_mail(sender="Chris Almost <cdalmost@gmail.com>",
+                       to="Chris Almost <cdalmost@gmail.com>",
+                       subject="Reminder %s vs. %s" % (game.r_name, game.b_name),
+                       body=story)
 
 class SendSummary(webapp.RequestHandler):
   def get(self):
     games = db.GqlQuery("SELECT * FROM Game")
-    long_ago = datetime.datetime.now() - datetime.timedelta(weeks=9)
+    long_ago = datetime.datetime.now() - datetime.timedelta(weeks=5)
 
-    entries = ['Red vs. Blue']
+    entries = ['Cheers!']
     for game in games:
       flag = '(old)' if game.date_modified < long_ago else '(new)'
-      entries.append("created %s, last modified %s, %s vs. %s %s"
-          % (str(game.date_created.date()),
-             str(game.date_modified.date()),
-             game.r_name, game.b_name, flag))
+      story = "%s vs. %s, created %s, last modified %s %s" \
+          % (game.r_name, game.b_name, str(game.date_created.date()), \
+          str(game.date_modified.date()), flag)
+      if 'w' == game.onus: # Game has a winner.
+        story += ", %s won" % game.winner
+      entries.append(story)
+    entries.append('Red vs. Blue')
+    entries.reverse()
 
     mail.send_mail(sender="Chris Almost <cdalmost@gmail.com>",
                    to="Chris Almost <cdalmost@gmail.com>",
