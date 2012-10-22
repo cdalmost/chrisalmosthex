@@ -14,16 +14,21 @@ class SendReminders(webapp.RequestHandler):
                         "WHERE date_modified < :1 AND date_modified > :2",
                         period, long_ago)
 
+    entries = ['Cheers!']
     for game in games:
       if not 'w' == game.onus: # Game has no winner yet.
         story = "%s vs. %s, created %s, last modified %s" \
             % (game.r_name, game.b_name, \
             str(game.date_created.date()), \
             str(game.date_modified.date()))
-        mail.send_mail(sender="Chris Almost <cdalmost@gmail.com>",
-                       to="Chris Almost <cdalmost@gmail.com>",
-                       subject="Reminder %s vs. %s" % (game.r_name, game.b_name),
-                       body=story)
+        entries.append(story)
+    entries.append('Red vs. Blue')
+    entries.reverse()
+
+    mail.send_mail(sender="Chris Almost <cdalmost@gmail.com>",
+                   to="Chris Almost <cdalmost@gmail.com>",
+                   subject="Hex reminders",
+                   body='\n'.join(entries))
 
 class SendSummary(webapp.RequestHandler):
   def get(self):

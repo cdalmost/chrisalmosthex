@@ -1,7 +1,8 @@
 application: chrisalmosthex
-version: 1-3
-runtime: python
+version: 1-4
+runtime: python27
 api_version: 1
+threadsafe: false
 
 inbound_services:
 - channel_presence
@@ -21,4 +22,8 @@ handlers:
   script: tasks.py
 
 - url: /.*
-  script: hex.py
+  script: hex.app
+
+libraries:
+- name: jinja2
+  version: latest

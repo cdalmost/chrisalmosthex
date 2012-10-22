@@ -1,11 +1,12 @@
 # Copyright (c) Christopher Almost, 2011.
 
-import os, re, datetime, hashlib, urllib
+import os, re, datetime, hashlib, urllib, webapp2, jinja2
 from hexutils import HexGame
 from google.appengine.api import mail, channel
-from google.appengine.ext import db, webapp
-from google.appengine.ext.webapp import template
-from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.ext import db
+
+jinja_environment = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
 class Game(db.Model):
   """Models a hex game, with the players, contact info, game state, etc."""
@@ -31,17 +32,17 @@ class Game(db.Model):
   date_created  = db.DateTimeProperty(auto_now_add=True)
   date_modified = db.DateTimeProperty(auto_now=True)
 
-class CreatePage(webapp.RequestHandler):
+class CreatePage(webapp2.RequestHandler):
   def get(self):
-    path = os.path.join(os.path.dirname(__file__), 'templates/create.html')
-    self.response.out.write(template.render(path, dict()))
+    template = jinja_environment.get_template('templates/create.html')
+    self.response.out.write(template.render(dict()))
 
-class AboutPage(webapp.RequestHandler):
+class AboutPage(webapp2.RequestHandler):
   def get(self):
-    path = os.path.join(os.path.dirname(__file__), 'templates/about.html')
-    self.response.out.write(template.render(path, dict()))
+    template = jinja_environment.get_template('templates/about.html')
+    self.response.out.write(template.render(dict()))
 
-class GameCreator(webapp.RequestHandler):
+class GameCreator(webapp2.RequestHandler):
   def post(self):
     # Get the data and do some verification.
     p1 = self.request.get('p1').strip().title() # Creator
@@ -88,7 +89,7 @@ class GameCreator(webapp.RequestHandler):
     # Send the creator to his (blank) game page.
     self.redirect('/play?' + urllib.urlencode({'hash': g.b_hash}))
 
-class ConnectionHandler(webapp.RequestHandler):
+class ConnectionHandler(webapp2.RequestHandler):
   def post(self):
     game_hash = self.request.get('from')
     p, g = player_and_game_from_hash(game_hash)
@@ -99,7 +100,7 @@ class ConnectionHandler(webapp.RequestHandler):
         g.b_conn = True
       g.put()
 
-class DisconnectionHandler(webapp.RequestHandler):
+class DisconnectionHandler(webapp2.RequestHandler):
   def post(self):
     game_hash = self.request.get('from')
     p, g = player_and_game_from_hash(game_hash)
@@ -110,7 +111,7 @@ class DisconnectionHandler(webapp.RequestHandler):
         g.b_conn = False
       g.put()
 
-class GameDisplayer(webapp.RequestHandler):
+class GameDisplayer(webapp2.RequestHandler):
   def get(self):
     # A player wishes to view his game.
     game_hash = self.request.get('hash')
@@ -134,13 +135,13 @@ class GameDisplayer(webapp.RequestHandler):
         'm': g.onus,
         'p': p,
       }
-      path = os.path.join(os.path.dirname(__file__), 'templates/play.html')
-      self.response.out.write(template.render(path, template_values))
+      template = jinja_environment.get_template('templates/play.html')
+      self.response.out.write(template.render(template_values))
     else:
       # Invalid hash (or there was none): show them the start page.
       self.redirect('/')
 
-class MoveMaker(webapp.RequestHandler):
+class MoveMaker(webapp2.RequestHandler):
   def post(self):
     # A move has been suggested.
     game_hash = self.request.get('hash')
@@ -254,16 +255,12 @@ Your opponent, %s, resigned, so you won the game.  Congratulations.
 http://hex.chrisalmost.org/play?%s
 """
 
-def main():
-  run_wsgi_app(webapp.WSGIApplication([
-      ('/play',   GameDisplayer),
-      ('/move',   MoveMaker),
-      ('/create', GameCreator),
-      ('/about',  AboutPage),
-      ('/_ah/channel/disconnected/', DisconnectionHandler),
-      ('/_ah/channel/connected/',    ConnectionHandler),
-      ('/.*', CreatePage),
-    ], debug=True))
-
-if __name__ == '__main__':
-  main()
+app = webapp2.WSGIApplication([
+  ('/play',   GameDisplayer),
+  ('/move',   MoveMaker),
+  ('/create', GameCreator),
+  ('/about',  AboutPage),
+  ('/_ah/channel/disconnected/', DisconnectionHandler),
+  ('/_ah/channel/connected/',    ConnectionHandler),
+  ('/.*', CreatePage),
+], debug=False)
